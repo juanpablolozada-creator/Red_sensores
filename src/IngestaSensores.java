@@ -1,17 +1,14 @@
 /* ============================================================
    PLATAFORMA DE MONITOREO AMBIENTAL URBANO
-   IngestaSensores - VERSION 0.2
+   IngestaSensores - VERSION 0.3 (Semana 3)
 
-   Novedades frente a la Semana 1:
-   - La logica esta en metodos, no en un main gigante.
-   - Las lecturas ya no se imprimen y se olvidan: se GUARDAN.
-   - La validacion vive dentro de LecturaSensor.esValida().
-
-   Este archivo esta terminado. Los que estan incompletos son
-   RepositorioLecturas y AnalizadorMatriz.
+   Novedades frente a la Semana 2:
+   - Integración con BancoDePruebas para análisis de algoritmos de búsqueda.
+   - Conserva único punto de entrada (main) para todo el proyecto.
    ============================================================ */
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -35,13 +32,36 @@ public class IngestaSensores {
         System.out.println("Lecturas almacenadas:      " + repositorio.tamano());
         System.out.println("Descartadas por formato:   " + descartadasPorFormato);
         System.out.println("Descartadas por rango:     " + descartadasPorRango);
-        System.out.println();
-        System.out.println("PM2.5 promedio (repositorio): " + repositorio.promedioPm25());
+        System.out.printf("PM2.5 promedio:            %.2f%n", repositorio.promedioPm25());
         System.out.println();
         System.out.println("=== PERFIL HORARIO DE LA CIUDAD ===");
         for (int h = 0; h < 24; h++) {
             System.out.printf("Hora %02d -> PM2.5 promedio: %.2f%n", h, analizador.promedioDeHora(h));
         }
+
+        System.out.println();
+        System.out.println("=== SEMANA 3 ===");
+        BancoDePruebas.experimentoUno();
+        BancoDePruebas.experimentoDos();
+        BancoDePruebas.experimentoTres();
+        BancoDePruebas.experimentoCuatro();
+    }
+
+    /**
+     * Resuelve la ruta del archivo de datos según desde dónde se ejecute el programa
+     * (raíz del proyecto, carpeta src o carpeta data).
+     */
+    private static String resolverRuta(String nombreArchivo) {
+        if (new File(nombreArchivo).exists()) {
+            return nombreArchivo;
+        }
+        if (new File("data/" + nombreArchivo).exists()) {
+            return "data/" + nombreArchivo;
+        }
+        if (new File("../data/" + nombreArchivo).exists()) {
+            return "../data/" + nombreArchivo;
+        }
+        return nombreArchivo;
     }
 
     /**
@@ -49,7 +69,8 @@ public class IngestaSensores {
      */
     private static void cargarArchivo(RepositorioLecturas repositorio,
                                       AnalizadorMatriz analizador) throws IOException {
-        BufferedReader lector = new BufferedReader(new FileReader(ARCHIVO));
+        String ruta = resolverRuta(ARCHIVO);
+        BufferedReader lector = new BufferedReader(new FileReader(ruta));
         lector.readLine(); // encabezado
 
         String linea;

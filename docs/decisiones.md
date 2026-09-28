@@ -37,4 +37,24 @@ Formato: cada entrada con fecha, decision, alternativas consideradas, justificac
 - **Elegida:** B) Ignorar la lectura duplicada.
 - **Justificación:** Mantiene la precisión de las lecturas en memoria. Evita que registros repetidos en el archivo de origen incrementen innecesariamente el tamaño del repositorio o distorsionen los cálculos de promedios ambientales.
 
+## S3 - Búsqueda y Eficiencia - 2026-09-28
+
+### Decisión 7: Búsqueda binaria por timestamp
+
+- **Precondición:** La búsqueda binaria requiere que las lecturas estén ordenadas ascendentemente por timestamp.
+- **Condición actual del proyecto:** `GeneradorDatos` produce timestamps en orden cronológico ascendente.
+- **Decisión:** Utilizar búsqueda binaria para consultas por timestamp sobre el repositorio ordenado.
+- **Justificación:** La búsqueda binaria reduce drásticamente el número de comparaciones de un crecimiento lineal O(n) a un crecimiento logarítmico O(log n), pasando de 1.000.000 de comparaciones en el peor caso a tan solo 20 comparaciones en arreglos de gran escala.
+
+### Decisión 8: Búsqueda sobre campos no ordenados (PM2.5)
+
+- **Precondición:** La búsqueda binaria exige ordenamiento en el campo clave.
+- **Condición actual del proyecto:** Los valores de PM2.5 se generan con variabilidad continua y no garantizan ordenamiento.
+- **Decisión:** No se utilizará búsqueda binaria directamente sobre PM2.5 mientras los datos no estén ordenados; se emplea búsqueda lineal secuencial O(n).
+- **Justificación:** El experimento 4 demostró que aplicar búsqueda binaria sobre datos no ordenados provoca que el algoritmo falle silenciosamente (0 aciertos de 20 datos que sí existían). La corrección y fiabilidad del sistema prevalece sobre la velocidad.
+
+### Pregunta pendiente para la Semana 4
+¿Conviene ordenar los datos previamente para habilitar búsquedas binarias frecuentes, o el costo computacional de ordenar supera el beneficio de las búsquedas? Se analizará en la Semana 4 con algoritmos de ordenamiento.
+
+
 
